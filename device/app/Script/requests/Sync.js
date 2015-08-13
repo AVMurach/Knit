@@ -2,6 +2,7 @@
 	DrawDataReport();
 
 	DrawFtpReport();
+	SyncData();
 }
 
 // -------------------- Sync Data ------------
@@ -10,15 +11,15 @@ function SyncData() {
 	 $.dataSyncError.Visible = false;
 	 $.dataSyncLayout.Visible = true;
 	 $.dataSyncIndicator.Start();
-	 
+	 MarkVisits();
 	 DB.Sync(SyncDataFinish);
 	}
 
 	function SyncDataFinish() {
 	 $.dataSyncIndicator.Stop();
 	 $.dataSyncLayout.Visible = false;
-	 
 	 DrawDataReport();
+	 Workflow.Action("DoCommit", []);
 	}
 
 	function DrawDataReport() {
@@ -30,14 +31,13 @@ function SyncData() {
 	  $.dataSyncReport.Text = date + at + time;
 	  $.dataSyncReport.Visible = true;
 	  $.dataSyncError.Visible = false;
-	  $.buttonSendLog.Visible = false;
 	 } else {
-	   
+	  RollBackMark(); 
 	  $.dataSyncError.Text = Translate["#error#"] + ": " + date + at + time;
 	  $.dataSyncError.Visible = true;
 	  $.dataSyncReport.Visible = false;
-	  $.buttonSendLog.Visible = true;
 	 }
+	 
 	}
 
 	
@@ -120,14 +120,4 @@ function DrawFtpReport() {
 		$.ftpSyncError.Visible = true;
 		$.ftpSyncReport.Visible = false;
 	}
-}
-
-function SendLog() {
-	var result = Application.SendDatabase();
-
-	if (result)
-		Dialog.Message("Отправлено");
-	else
-		Dialog.Message("Произошла ошибка во время отправки. Данные не отправлены");
-
 }
