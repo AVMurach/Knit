@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<bp:BusinessProcess xmlns:bp="BitMobile.BusinessProcess">
+
+  <bp:Workflow Name="Main" Controller="Main\Main.js">
+
+    <bp:Step Name="Menu" Screen="Main.xml" Controller="Main\Main.js">
+      <bp:Action Name="requests" NextWorkflow="requests"></bp:Action>
+      <bp:Action Name="customerlist" NextWorkflow="customerlist"></bp:Action>
+      <bp:Action Name="historylist" NextWorkflow="Historylist"></bp:Action>  
+      <bp:Action Name="samurai" NextWorkflow="samuraiGame"></bp:Action>    
+      <bp:Action Name="Sync" NextWorkflow="Sync"/>
+    </bp:Step>
+
+  </bp:Workflow>
+
+  
+
+
+ 
+  <bp:Workflow Name="Sync">
+    <bp:Step Name="Sync" Screen="Sync\Sync.xml" Controller="Sync\Main.js"/>
+  </bp:Workflow>
+
+
+</bp:BusinessProcess>
