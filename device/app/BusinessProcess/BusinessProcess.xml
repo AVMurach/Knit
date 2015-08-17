@@ -17,9 +17,16 @@
 	<bp:Workflow Name="requests">
 
 		<bp:Step Name="requests" Screen="requests.xml" Controller="requests\Main.js">
+			<bp:Action Name="SelectRequest" NextStep="SelectRequest"></bp:Action>
+		</bp:Step>
+		
+		<bp:Step Name="SelectRequest" Screen="Request.xml" Controller="requests\Request.js">
+			
 		</bp:Step>
 
 	</bp:Workflow>
+	
+	
 	
 	<bp:Workflow Name="Sync">
 		<bp:Step Name="Sync" Screen="Sync\Sync.xml" Controller="Sync\Main.js" />

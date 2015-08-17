@@ -1,40 +1,127 @@
 ﻿// ------------------------ requests screen module ------------------------
 
+function OnLoading(){
+	SetListType();
+}
+
+//Счетчик заявок на сегодня
 function GetTodaysActiveTask(){
-	var q = new Query("SELECT * FROM Document_Requests WHERE DateBeginPlan >= @DateStart AND DateEndPlan < @DateEnd ");
+	var q = new Query("SELECT Id FROM Document_Requests WHERE DateBeginPlan >= @DateStart AND DateEndPlan < @DateEnd ");
 	q.AddParameter("DateStart", DateTime.Now.Date);
 	q.AddParameter("DateEnd", DateTime.Now.Date.AddDays(1));
 	return q.ExecuteCount(); 
 }
 
-
+//Счетчик всех заявок
 function GetAllActiveTask(){
-	var q = new Query("SELECT * FROM Document_Requests ");//
+	var q = new Query("SELECT Id FROM Document_Requests ");//
 	return q.ExecuteCount(); 
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function OnLoading(){
-	SetListType();
+//Получение заявок на сегодня
+function GetToDayDoneRequestsWithSearch(searchText, getCount){//(searchText - строка поиска, getCount - получать ли количество[1-ДА,0-НЕТ])
+	var q = new Query();
+	var qtext = "SELECT REQ.Id AS Ind, REQ.ShortDescription, REQ.Status, REQ.DateBeginPlan, REQ.DateEndPlan, CLNT.Description AS Descr " +
+			"FROM Document_Requests REQ " +
+			"LEFT JOIN Enum_StatusTask ST ON ST.Id = REQ.Status " +
+			"LEFT JOIN Catalog_Clients CLNT ON CLNT.Id = REQ.Partner " +
+			"WHERE (REQ.DateBeginPlan >= @DateStart AND REQ.DateEndPlan < @DateEnd)";
+	if (searchText != null && searchText != ""){
+		searchtail = "AND  Contains(REQ.Description, @SearchText)";
+		
+		q.AddParameter("SearchText", searchText);
+		qtext = qtext + searchtail;
+	}
+	q.Text = qtext + "  ORDER BY REQ.DateBeginPlan";
+	
+	q.AddParameter("DateStart", DateTime.Now.Date);
+	q.AddParameter("DateEnd", DateTime.Now.Date.AddDays(1));
+	
+	if (getCount == 0) {
+		var c = q.Execute();
+		return c; 
+	} else {
+		return q.ExecuteCount();
+	}
 }
+
+//Получение всех заявок
+function GetAllActiveTaskDetails(searchtext){
+	var q = new Query();
+	var qtext = "SELECT REQ.Id AS Ind, REQ.ShortDescription, REQ.Status, REQ.DateBeginPlan, REQ.DateEndPlan, CLNT.Description  AS Descr " +
+			"FROM Document_Requests REQ " +
+			"LEFT JOIN Enum_StatusTask ST ON ST.Id = REQ.Status " +
+			"LEFT JOIN Catalog_Clients CLNT ON CLNT.Id = REQ.Partner ";
+	
+	if (searchtext != null && searchtext != ""){
+		var searchtail = " AND  Contains(REQ.Description, @SearchText)";
+		q.AddParameter("SearchText", searchtext);
+		qtext = qtext + searchtail;
+	}
+	
+	/*if (recvStartPeriod != undefined){
+		var starttail = " AND REQ.PlanStartDataTime >= @DateStart";//AND REQ.PlanStartDataTime < @DateEnd
+		q.AddParameter("DateStart", recvStartPeriod);
+		qtext = qtext + starttail;
+		
+	}
+	
+	if (recvStopPeriod != undefined){
+		var stoptail = " AND REQ.PlanStartDataTime < @DateEnd";//AND REQ.PlanStartDataTime < @DateEnd
+		q.AddParameter("DateEnd", recvStopPeriod);
+		qtext = qtext + stoptail;
+	}*/
+	
+	q.Text = qtext + "  ORDER BY REQ.DateBeginPlan";
+	var c = q.Execute();
+	//Dialog.Debug(c);
+	return c; 
+}
+
+
+
+
+
+//////////////////////////////////////////////// ОБЩИЕ ФУНКЦИИ
+function PeriodTime(dateStart, dateStop){
+
+	if (dateStop != NULL){
+		var p = String.Format("{0:dd.MM.} {0:HH:mm} - {1:HH:mm}", DateTime.Parse(dateStart), DateTime.Parse(dateStop));
+		//String.Format("{0:dd.MM. 0:hh:mm - 1:hh:mm}", DateTime.Parse(dateStart), DateTime.Parse(dateStop));
+	} else {
+		var p = String.Format("{0:dd.MM.} {0:HH:mm}", DateTime.Parse(dateStart));
+	}	
+	return p;
+}
+
+
+
+//-----------------------------code from Masha----------------------------
+
+
+function SetListType() {
+    if ($.Exists("visitsType") == false)
+        $.AddGlobal("visitsType", "planned");
+    else
+        return $.visitsType;
+}
+
+function ChangeListAndRefresh(control) {
+    $.Remove("visitsType");
+    $.AddGlobal("visitsType", control);
+    Workflow.Refresh([]);
+}
+
+
+
+
+
+
+
+
+//////////////////////////////////////////////////////////  СТАРОЕ
+
+
 
 function MakeFilterSettingsBackUp(){
 	
@@ -91,28 +178,7 @@ function GetToDayUnDoneRequestsWithSearch(searchText, getCount){//(searchText - 
 	}
 }
 
-function GetToDayDoneRequestsWithSearch(searchText, getCount){//(searchText - строка поиска, getCount - получать ли количество[1-ДА,0-НЕТ])
-	var q = new Query();
-	var qtext = "SELECT CUST.Description AS CustName,  ADDRS.Address AS Addr, REQ.PlanStartDataTime AS Start, REQ.PlanEndDataTime AS Stop, REQ.Id AS Ind FROM Document_Visit REQ LEFT JOIN Catalog_Customer CUST ON REQ.Customer = CUST.Id LEFT JOIN Catalog_Outlet ADDRS ON REQ.Outlet = ADDRS.Id WHERE (REQ.PlanStartDataTime >= @DateStart AND REQ.PlanStartDataTime < @DateEnd AND REQ.Status == @StatusComp)";
-	if (searchText != null && searchText != ""){
-		searchtail = "AND  Contains(CUST.Description, @SearchText)";
-		//searchtail = " AND CUST.Description LIKE @SearchText";
-		//AND  Contains(CUST.Description, @SearchText)
-		q.AddParameter("SearchText", searchText);
-		qtext = qtext + searchtail;
-	}
-	q.Text = qtext + "  ORDER BY REQ.PlanStartDataTime";
-	q.AddParameter("StatusComp", DB.Current.Constant.VisitStatus.Completed);
-	q.AddParameter("DateStart", DateTime.Now.Date);
-	q.AddParameter("DateEnd", DateTime.Now.Date.AddDays(1));
-	//Dialog.Debug(q.ExecuteCount());
-	if (getCount == 0) {
-		var c = q.Execute();
-		return c; 
-	} else {
-		return q.ExecuteCount();
-	}
-}
+
 	
 function SetBeginDate() {
 	var header = Translate["#enterDateTime#"];
@@ -145,36 +211,7 @@ function SetEndDateNow(key) {
 	//Workflow.Refresh([]);
 }
 
-function GetAllActiveTaskDetails(searchtext){
-	var q = new Query();
-	var qtext = "SELECT CUST.Description AS CustName,  ADDRS.Address AS Addr, REQ.PlanStartDataTime AS Start, REQ.PlanEndDataTime AS Stop, REQ.Id AS Ind FROM Document_Visit REQ LEFT JOIN Catalog_Customer CUST ON REQ.Customer = CUST.Id LEFT JOIN Catalog_Outlet ADDRS ON REQ.Outlet = ADDRS.Id WHERE (Status == @StatusProc OR Status == @StatusEx)";
-	
-	if (searchtext != null && searchtext != ""){
-		var searchtail = " AND  Contains(CUST.Description, @SearchText)";
-		q.AddParameter("SearchText", searchtext);
-		qtext = qtext + searchtail;
-	}
-	
-	if (recvStartPeriod != undefined){
-		var starttail = " AND REQ.PlanStartDataTime >= @DateStart";//AND REQ.PlanStartDataTime < @DateEnd
-		q.AddParameter("DateStart", recvStartPeriod);
-		qtext = qtext + starttail;
-		
-	}
-	
-	if (recvStopPeriod != undefined){
-		var stoptail = " AND REQ.PlanStartDataTime < @DateEnd";//AND REQ.PlanStartDataTime < @DateEnd
-		q.AddParameter("DateEnd", recvStopPeriod);
-		qtext = qtext + stoptail;
-	}
-	
-	q.Text = qtext + "  ORDER BY REQ.PlanStartDataTime";
-	q.AddParameter("StatusProc", DB.Current.Constant.VisitStatus.Processing);
-	q.AddParameter("StatusEx", DB.Current.Constant.VisitStatus.Expected);
-	var c = q.Execute();
-	//Dialog.Debug(c);
-	return c; 
-}
+
 
 function ClearFilter(){
 	recvStartPeriod = undefined;
@@ -182,16 +219,7 @@ function ClearFilter(){
 	Workflow.Refresh([]);
 }
 
-function PeriodTime(dateStart, dateStop){
 
-	if (dateStop != NULL){
-		var p = String.Format("{0:dd.MM.} {0:HH:mm} - {1:HH:mm}", DateTime.Parse(dateStart), DateTime.Parse(dateStop));
-		//String.Format("{0:dd.MM. 0:hh:mm - 1:hh:mm}", DateTime.Parse(dateStart), DateTime.Parse(dateStop));
-	} else {
-		var p = String.Format("{0:dd.MM.} {0:HH:mm}", DateTime.Parse(dateStart));
-	}	
-	return p;
-}
 
 function filterDate(dt){
 	if (dt != null){
@@ -243,20 +271,6 @@ function findinalltext(key){
 	$.AddGlobal("searchAll", key);
 	Workflow.Refresh([]);
 }
-//-----------------------------code from Masha----------------------------
 
-
-function SetListType() {
-    if ($.Exists("visitsType") == false)
-        $.AddGlobal("visitsType", "planned");
-    else
-        return $.visitsType;
-}
-
-function ChangeListAndRefresh(control) {
-    $.Remove("visitsType");
-    $.AddGlobal("visitsType", control);
-    Workflow.Refresh([]);
-}
 
 

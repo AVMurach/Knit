@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<c:Screen xmlns:c="BitMobile.Controls" xmlns:s="BitMobile.ValueStack"	StyleSheet="requests.css">
+<c:Screen xmlns:c="BitMobile.Controls" xmlns:s="BitMobile.ValueStack"
+	StyleSheet="requests.css">
 	<c:VerticalLayout>
 
 		<c:DockLayout CssClass="top_navigator">
-			<c:HorizontalLayout CssClass="btn_menu" OnEvent="Back"	OnClickAction="$Workflow.DoRollback()">
+			<c:HorizontalLayout CssClass="btn_menu" OnEvent="Back" OnClickAction="$Workflow.DoRollback()">
 				<c:Image CssClass="menuIcon" />
 			</c:HorizontalLayout>
 			<c:Button Id="btnForward" Text="" CssClass="btn_forward" />
@@ -48,7 +49,7 @@
 
 
 
-		<!-- <s:If Test="$visitsType=='planned'">
+		<s:If Test="$visitsType=='planned'">
 			<c:HorizontalLayout CssClass="search">
 				<c:DockLayout>
 					<c:Image />
@@ -59,9 +60,8 @@
 					OnClickAction="$findtodaytext($edtSearchToDay.Text)"></c:Button>
 			</c:HorizontalLayout>
 			<c:HorizontalLayout CssClass="shadowLine"></c:HorizontalLayout>
-			<s:Push Id="cv" Value="$GetToDayDoneRequestsWithSearch($searchToDay, 1)"></s:Push>
 			<c:ScrollView Id="SVToDay">
-				<s:If Test="$sv > 0 || $cv > 0">
+				<s:If Test="$sv > 0">
 					<s:Push Id="sv"
 						Value="$GetToDayUnDoneRequestsWithSearch($searchToDay, 1)"></s:Push>
 					<s:If Test="$sv > 0">
@@ -74,16 +74,16 @@
 
 						<s:Iterator Id="request" Value="$undonerequests">
 
-
-
 							<c:HorizontalLine />
-							<c:HorizontalLayout CssClass="grid"
-								OnClickAction="$Workflow.DoAction(SelectItem, $request.Ind)">
+							<c:HorizontalLayout CssClass="grid" OnClickAction="$Workflow.DoAction(SelectRequest, $request.Ind)">
 								<c:VerticalLayout CssClass="no_mark"></c:VerticalLayout>
 								<c:VerticalLayout>
-									<c:TextView Text="$request.CustName" CssClass="main_row"></c:TextView>
-									<c:TextView Text="$request.Addr" CssClass="description_row"></c:TextView>
-									<c:TextView Text="$PeriodTime($request.Start, $request.Stop)"
+									<c:TextView Text="$request.Descr" CssClass="main_row"></c:TextView>
+									<c:TextView Text="$request.ShortDescription"
+										CssClass="description_row"></c:TextView>
+									<!-- <c:TextView Text="$PeriodTime($request.DateBeginPlan, $request.DateEndPlan)" 
+										CssClass="description_daterow"></c:TextView> -->
+									<c:TextView Text="{$request.DateBeginPlan} {$request.DateEndPlan}"
 										CssClass="description_daterow"></c:TextView>
 								</c:VerticalLayout>
 								<c:Image />
@@ -97,38 +97,7 @@
 
 					</s:If>
 
-					<s:If Test="$cv > 0">
-						<c:HorizontalLayout CssClass="caption_grid">
-							<s:Push Id="commitedrequests"
-								Value="$GetToDayDoneRequestsWithSearch($searchToDay, 0)"></s:Push>
-							<c:TextView Text="#donerequests# ({$cv}):"></c:TextView>
-						</c:HorizontalLayout>
 
-
-
-						<s:Iterator Id="cRequest" Value="$commitedrequests">
-
-
-
-							<c:HorizontalLine />
-							<c:HorizontalLayout CssClass="grid"
-								OnClickAction="$Workflow.DoAction(SelectItem, $cRequest.Ind)">
-								<c:VerticalLayout CssClass="no_mark"></c:VerticalLayout>
-								<c:VerticalLayout>
-									<c:TextView Text="$cRequest.CustName" CssClass="main_row"></c:TextView>
-									<c:TextView Text="$cRequest.Addr" CssClass="description_row"></c:TextView>
-									<c:TextView Text="$PeriodTime($cRequest.Start, $cRequest.Stop)"
-										CssClass="description_daterow"></c:TextView>
-								</c:VerticalLayout>
-							</c:HorizontalLayout>
-
-
-
-							<c:HorizontalLayout CssClass="end_of_block" />
-
-						</s:Iterator>
-						<c:HorizontalLine />
-					</s:If>
 				</s:If>
 				<s:Else>
 					<c:TextView Text="Нет заявок на сегодня" CssClass="emptyRecordSet" />
@@ -136,25 +105,14 @@
 			</c:ScrollView>
 		</s:If>
 		<s:Else>
-			<c:SwipeHorizontalLayout Id="swipe_layout"
-				CssClass="swipe_layout" Index="0">
-				<c:HorizontalLayout CssClass="parameter_grid"
-					onClickAction="$Workflow.DoAction(EditFilter)">
-					<c:TextView Text="#period#" CssClass="periodcaption"></c:TextView>
-					<c:TextView Id="Period"
-						Text="{$filterDateCaption(@recvStartPeriod)} - {$filterDateCaption(@recvStopPeriod)}"
-						CssClass="filtervalue"></c:TextView>
-					<c:Image CssClass="filterarrow" />
-				</c:HorizontalLayout>
-
-				<c:HorizontalLayout CssClass="grey_swipe"
-					OnClickAction="$ClearFilter()">
-					<c:VerticalLayout>
-						<c:TextView Text="#Clear#"></c:TextView>
-					</c:VerticalLayout>
-				</c:HorizontalLayout>
-
-			</c:SwipeHorizontalLayout>
+			<!-- <c:SwipeHorizontalLayout Id="swipe_layout" CssClass="swipe_layout" 
+				Index="0"> <c:HorizontalLayout CssClass="parameter_grid" onClickAction="$Workflow.DoAction(EditFilter)"> 
+				<c:TextView Text="#period#" CssClass="periodcaption"></c:TextView> <c:TextView 
+				Id="Period" Text="{$filterDateCaption(@recvStartPeriod)} - {$filterDateCaption(@recvStopPeriod)}" 
+				CssClass="filtervalue"></c:TextView> <c:Image CssClass="filterarrow" /> </c:HorizontalLayout> 
+				<c:HorizontalLayout CssClass="grey_swipe" OnClickAction="$ClearFilter()"> 
+				<c:VerticalLayout> <c:TextView Text="#Clear#"></c:TextView> </c:VerticalLayout> 
+				</c:HorizontalLayout> </c:SwipeHorizontalLayout> -->
 			<c:HorizontalLine />
 
 			<c:HorizontalLayout CssClass="search">
@@ -177,14 +135,13 @@
 
 
 						<c:HorizontalLine />
-						<c:HorizontalLayout CssClass="grid"
-							OnClickAction="$Workflow.DoAction(SelectItem, $allrequest.Ind)">
+						<c:HorizontalLayout CssClass="grid" OnClickAction="$Workflow.DoAction(SelectRequest, $request.Ind)">
 							<c:VerticalLayout CssClass="no_mark"></c:VerticalLayout>
 							<c:VerticalLayout>
-								<c:TextView Text="$allrequest.CustName" CssClass="main_row"></c:TextView>
-								<c:TextView Text="$allrequest.Addr" CssClass="description_row"></c:TextView>
-								<c:TextView Text="$PeriodTime($allrequest.Start, $allrequest.Stop)"
-									CssClass="description_daterow"></c:TextView>
+								<c:TextView Text="$allrequest.Descr" CssClass="main_row"></c:TextView>
+								<c:TextView Text="$allrequest.ShortDescription" CssClass="description_row"></c:TextView>
+								<!-- <c:TextView Text="$PeriodTime($request.DateBeginPlan, $request.DateEndPlan)" CssClass="description_daterow"></c:TextView> -->
+								<c:TextView Text="{$allrequest.DateBeginPlan} {$allrequest.DateEndPlan}" CssClass="description_daterow"></c:TextView>
 							</c:VerticalLayout>
 							<c:Image />
 						</c:HorizontalLayout>
@@ -202,7 +159,7 @@
 			<s:Else>
 				<c:TextView Text="Нет заявок" CssClass="emptyRecordSetAllRequest" />
 			</s:Else>
-		</s:Else> -->
+		</s:Else>
 
 
 	</c:VerticalLayout>
