@@ -6,7 +6,7 @@ function OnLoading(){
 
 //Счетчик заявок на сегодня
 function GetTodaysActiveTask(){
-	var q = new Query("SELECT Id FROM Document_Requests WHERE DateBeginPlan >= @DateStart AND DateEndPlan < @DateEnd ");
+	var q = new Query("SELECT Id FROM Document_Requests WHERE DateBeginPlan >= @DateStart AND DateBeginPlan < @DateEnd ");
 	q.AddParameter("DateStart", DateTime.Now.Date);
 	q.AddParameter("DateEnd", DateTime.Now.Date.AddDays(1));
 	return q.ExecuteCount(); 
@@ -25,9 +25,9 @@ function GetToDayDoneRequestsWithSearch(searchText, getCount){//(searchText - с
 			"FROM Document_Requests REQ " +
 			"LEFT JOIN Enum_StatusTask ST ON ST.Id = REQ.Status " +
 			"LEFT JOIN Catalog_Clients CLNT ON CLNT.Id = REQ.Partner " +
-			"WHERE (REQ.DateBeginPlan >= @DateStart AND REQ.DateEndPlan < @DateEnd)";
+			"WHERE (REQ.DateBeginPlan >= @DateStart AND REQ.DateBeginPlan < @DateEnd)";
 	if (searchText != null && searchText != ""){
-		searchtail = "AND  Contains(REQ.Description, @SearchText)";
+		searchtail = "AND  Contains(CLNT.Description, @SearchText)";
 		
 		q.AddParameter("SearchText", searchText);
 		qtext = qtext + searchtail;
@@ -54,7 +54,7 @@ function GetAllActiveTaskDetails(searchtext){
 			"LEFT JOIN Catalog_Clients CLNT ON CLNT.Id = REQ.Partner ";
 	
 	if (searchtext != null && searchtext != ""){
-		var searchtail = " AND  Contains(REQ.Description, @SearchText)";
+		var searchtail = " AND  Contains(CLNT.Description, @SearchText)";
 		q.AddParameter("SearchText", searchtext);
 		qtext = qtext + searchtail;
 	}
@@ -94,7 +94,17 @@ function PeriodTime(dateStart, dateStop){
 	return p;
 }
 
+function Test(testValue){
+	Dialod.Debug(testValue);
+	return;
+}
 
+function AddGlobalAndAction(name, value, actionName) {
+	if (Variables.Exists(name))
+		$.Remove(name);
+	$.AddGlobal(name, value);
+	Workflow.Action(actionName, []);
+}
 
 //-----------------------------code from Masha----------------------------
 

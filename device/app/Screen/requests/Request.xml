@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<c:Screen xmlns:c="BitMobile.Controls" xmlns:s="BitMobile.ValueStack"
-	StyleSheet="Request.css">
-	<s:Push Id="curreq" Value="$GetCurrentRequest($param1)"></s:Push>
+<c:Screen xmlns:c="BitMobile.Controls" xmlns:s="BitMobile.ValueStack" StyleSheet="Request.css">
+		
+	<s:Push Id="curreq" Value="$GetCurrentRequest()"></s:Push>
+	
 	<c:DockLayout>
 
 		<c:DockLayout CssClass="top_navigator">
-			<c:HorizontalLayout CssClass="btn_back" OnEvent="Back"
-				OnClickAction="$Workflow.DoBack()">
+			<c:HorizontalLayout CssClass="btn_back" OnEvent="Back"	OnClickAction="$QuestAndDoRollback()">
 				<c:Image />
-				<c:TextView Text="#back#" />
+				<c:TextView Text="Список" />
 			</c:HorizontalLayout>
 			<!-- <c:Button Id="btnForward" Text="#next#" CssClass="btn_forward" OnClickAction="$DoActionAndSave(GoParams, 
 				$param1, $objCust, $objOutlet)"/> -->
-			<c:Button Id="btnForward" Text="#next#" CssClass="btn_forward" />
+			<c:Button Id="btnForward" Text="Готово" CssClass="btn_forward" OnClickAction="$Workflow.DoCommit()" />
 			<c:HorizontalLayout>
-				<c:TextView Text="#customer#" />
+				<c:TextView Text="Задача" />
 			</c:HorizontalLayout>
 		</c:DockLayout>
 
-		<c:DockLayout CssClass="footer">
+				
+		<!-- <c:DockLayout CssClass="footer">
 			<c:DockLayout CssClass="btn_left_footer">
 				<c:TextView Text="Контакты" />
 			</c:DockLayout>
@@ -27,135 +28,171 @@
 				<c:TextView Text="Параметры" />
 			</c:DockLayout>
 
-		</c:DockLayout>
+		</c:DockLayout> -->
+				
+		<c:DockLayout CssClass="footer">
+			<s:If Test="$curreq.StatName == 'Plan'">
+				<c:DockLayout CssClass="btn_footer" OnClickAction="$TakeExecution($curreq.Ind)">
+					<c:TextView Text="Принять к исполнению"  />
+				</c:DockLayout>
+			</s:If>
+			
+			<s:If Test="$curreq.StatName == 'InProgress'">
+				<c:DockLayout CssClass="btn_footer" OnClickAction="$RunTask($curreq.Ind)">
+					<c:TextView Text="Выполнить"  />
+				</c:DockLayout>
+			</s:If>
+		</c:DockLayout>	
+		
 		<c:ScrollView>
-			<c:HorizontalLayout CssClass="caption_grid">
-				<c:TextView Text="$curreq.Descr"></c:TextView>
-			</c:HorizontalLayout>
-						
-			<c:HorizontalLayout CssClass="caption_grid">
-				<c:TextView Text="{Как связаться:} {$curreq.ContactType}"></c:TextView>
-			</c:HorizontalLayout>
-			
-			<c:HorizontalLine />
-			
-			<c:HorizontalLayout CssClass="caption_grid">
-				<c:TextView Text="{Ответственный:} {$curreq.ContactType}"></c:TextView>
-			</c:HorizontalLayout>
-			
-			<c:HorizontalLayout CssClass="caption_grid">
-				<c:TextView Text="{Автор:} {$curreq.ContactType}"></c:TextView>
-			</c:HorizontalLayout>
-			
-			<c:HorizontalLine />
-			
-			<c:HorizontalLayout CssClass="caption_grid">
-				<c:TextView Text="{Исполнить до:} {$curreq.ContactType} {Исполнено:} {$curreq.ContactType}"></c:TextView>
-			</c:HorizontalLayout>
-			
-			<c:HorizontalLayout CssClass="caption_grid">
-				<c:TextView Text="{Принято к исполнению:} {$curreq.ContactType}"></c:TextView>
-			</c:HorizontalLayout>
-			
-			<c:HorizontalLayout CssClass="caption_grid">
-				<c:TextView Text="{Начать:} {$curreq.ContactType} {Закончить:} {$curreq.ContactType}"></c:TextView>
-			</c:HorizontalLayout>
-			
-			<c:HorizontalLine />
-			
-			<c:HorizontalLayout CssClass="caption_grid">
-				<c:TextView Text="{Цель взаимодействия:} {$curreq.ContactType}"></c:TextView>
-			</c:HorizontalLayout>
-			
-			<c:HorizontalLine />
-			
-			<c:HorizontalLayout CssClass="caption_grid">
-				<c:TextView Text="{Детальное описание:} {$curreq.ContactType}"></c:TextView>
-			</c:HorizontalLayout>
-			
-			<c:HorizontalLine />
-			
-			<c:HorizontalLayout CssClass="caption_grid">
-				<c:TextView Text="{Результат взаимодействия:} {$curreq.ContactType}"></c:TextView>
-			</c:HorizontalLayout>
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			<!-- <c:HorizontalLayout CssClass="grid">
-				<c:VerticalLayout CssClass="no_mark"></c:VerticalLayout>
-				<c:VerticalLayout>
-					<c:TextView Text="#descriptioncust#" CssClass="description_row"></c:TextView>
-					<c:TextView Text="$objCust.Description" CssClass="main_row_custname"></c:TextView>
-				</c:VerticalLayout>
-				<c:Image />
-			</c:HorizontalLayout>
 
-			<c:HorizontalLayout CssClass="end_of_block" />
+			<!-- <s:If Test="$СheckDateNull($curreq.DateAcceptance)"> -->
+			<s:If Test="$curreq.StatName == 'Plan'">
+				<c:HorizontalLayout CssClass="caption_grid">
+					<c:TextView Text="$curreq.Descr"></c:TextView>
+				</c:HorizontalLayout>
+				
+				<c:HorizontalLayout CssClass="caption_grid">
+					<c:TextView Text="{Детальное описание:} {$curreq.DetailDescription}"></c:TextView>
+				</c:HorizontalLayout>
+				
+				<c:HorizontalLayout CssClass="caption_grid">
+					<c:TextView
+						Text="{Начать:} {$GetDate_ddMMyy($curreq.DateBeginPlan)}   {Закончить:} {$GetDate_ddMMyy($curreq.DateEndPlan)}"></c:TextView>
+				</c:HorizontalLayout>
 
-			<c:HorizontalLayout CssClass="caption_grid">
-				<c:TextView Text="#request#:"></c:TextView>
-			</c:HorizontalLayout>
+			</s:If>
+			
+			<s:If Test="$curreq.StatName == 'InProgress'">
+			
+				<c:HorizontalLayout CssClass="caption_grid">
+					<c:TextView Text="$curreq.Descr"></c:TextView>
+				</c:HorizontalLayout>
 
-			<c:HorizontalLine />
-			<s:If Test="$isProgress($Curreq.Status)">
-				<c:DockLayout CssClass="parameter_grid" OnClickAction="$SetBeginDate($Curreq.Id)">
-					<c:TextView Text="#begin#"></c:TextView>
-					<c:TextView Id="beginDate" Text="$DoFullDate($Curreq.PlanStartDataTime)"
-						CssClass="value"></c:TextView>
-				</c:DockLayout>
+				<c:HorizontalLayout CssClass="caption_grid">
+					<c:TextView Text="{Контактное лицо:} {$curreq.ContactFace}"></c:TextView>
+				</c:HorizontalLayout>
+
+				<c:HorizontalLayout CssClass="caption_grid">
+					<c:TextView Text="{Как связаться:} {$curreq.ContactType}"></c:TextView>
+				</c:HorizontalLayout>
+
+				<c:HorizontalLine />
+
+				<c:HorizontalLayout CssClass="caption_grid">
+					<c:TextView Text="{Ответственный:} {$curreq.Responsible}"></c:TextView>
+				</c:HorizontalLayout>
+
+				<c:HorizontalLayout CssClass="caption_grid">
+					<c:TextView Text="{Автор:} {$curreq.Author}"></c:TextView>
+				</c:HorizontalLayout>
+
+				<c:HorizontalLine />
+
+				<c:HorizontalLayout CssClass="caption_grid">
+					<c:TextView
+						Text="{Исполнить до:} {$GetDate_ddMMyy($curreq.DateDonePlan)}   {Исполнено:} {$GetDate_ddMMyy($curreq.DateDone)}"></c:TextView>
+				</c:HorizontalLayout>
+
+				<c:HorizontalLayout CssClass="caption_grid">
+					<c:TextView
+						Text="{Принято к исполнению:} {$GetDate_ddMMyy($curreq.DateAcceptance)}"></c:TextView>
+				</c:HorizontalLayout>
+
+				<c:HorizontalLayout CssClass="caption_grid">
+					<c:TextView
+						Text="{Начать:} {$GetDate_ddMMyy($curreq.DateBeginPlan)}   {Закончить:} {$GetDate_ddMMyy($curreq.DateEndPlan)}"></c:TextView>
+				</c:HorizontalLayout>
+				
+				<c:HorizontalLayout CssClass="caption_grid">
+					<c:TextView
+						Text="{Начато:} {$GetDate_ddMMyy($curreq.DateAcceptance)}   "></c:TextView>
+				</c:HorizontalLayout>
+								
+				<c:HorizontalLine />
+
+				<c:HorizontalLayout CssClass="caption_grid">
+					<c:TextView Text="{Цель взаимодействия:} {$curreq.Target}"></c:TextView>
+				</c:HorizontalLayout>
+
+				<c:HorizontalLine />
+
+				<c:HorizontalLayout CssClass="caption_grid">
+					<c:TextView Text="{Детальное описание:} {$curreq.DetailDescription}"></c:TextView>
+				</c:HorizontalLayout>
+
+				<c:HorizontalLine />
+
+				<c:HorizontalLayout CssClass="caption_grid">
+					<c:TextView Text="{Результат взаимодействия:} {$curreq.ResultInter}"></c:TextView>
+				</c:HorizontalLayout>
+				
+				<c:HorizontalLine />
+								
+			</s:If>
+			
+			<s:If Test="$curreq.StatName == 'Done'">
+				<c:HorizontalLayout CssClass="caption_grid">
+					<c:TextView Text="$curreq.Descr"></c:TextView>
+				</c:HorizontalLayout>
+				
+				<c:HorizontalLayout CssClass="caption_grid">
+					<c:TextView Text="{Результат взаимодействия:} {$curreq.ResultInter}"></c:TextView>
+				</c:HorizontalLayout>
+				
+				<c:HorizontalLayout CssClass="caption_grid">
+					<c:TextView
+						Text="{Начать:} {$GetDate_ddMMyy($curreq.DateBeginPlan)}   {Закончить:} {$GetDate_ddMMyy($curreq.DateEndPlan)}"></c:TextView>
+				</c:HorizontalLayout>
+				
+				<c:HorizontalLayout CssClass="caption_grid">
+					<c:TextView
+						Text="{Начато:} {$GetDate_ddMMyy($curreq.DateAcceptance)}   {Закончено:} {$GetDate_ddMMyy($curreq.DateDone)}"></c:TextView>
+				</c:HorizontalLayout>
+				
 			</s:If>
 			<s:Else>
-				<c:DockLayout CssClass="parameter_grid">
-					<c:TextView Text="#begin#" CssClass="disableItem"></c:TextView>
-					<c:TextView Id="beginDate" Text="$DoFullDate($Curreq.PlanStartDataTime)"
-						CssClass="value"></c:TextView>
-				</c:DockLayout>
+
+				
+
 			</s:Else>
-			<c:HorizontalLine />
-			<s:If Test="$isProgress($Curreq.Status)">
-				<c:DockLayout CssClass="parameter_grid" OnClickAction="$SetEndDate($Curreq.Id)">
-					<c:TextView Text="#end#"></c:TextView>
-					<c:TextView Id="endDate" Text="$DoFullDate($Curreq.PlanEndDataTime)"
-						CssClass="value"></c:TextView>
-				</c:DockLayout>
-			</s:If>
-			<s:Else>
-				<c:DockLayout CssClass="parameter_grid">
-					<c:TextView Text="#end#" CssClass="disableItem"></c:TextView>
-					<c:TextView Id="endDate" Text="$DoFullDate($Curreq.PlanEndDataTime)"
-						CssClass="value"></c:TextView>
-				</c:DockLayout>
-			</s:Else>
-			<c:HorizontalLine />
-
-			<c:HorizontalLayout CssClass="memo_block">
-				<c:VerticalLayout>
-					<c:TextView Text="#requesttext#" CssClass="description_row"></c:TextView>
-					<c:TextView Text="$Curreq.TextTask" CssClass="main_row_reqtext"></c:TextView>
-				</c:VerticalLayout>
-			</c:HorizontalLayout>
-
-			<c:HorizontalLine />
-			<c:HorizontalLayout CssClass="grid"
-				OnClickAction="$Workflow.DoAction(SelectItem)">
-				<c:VerticalLayout CssClass="no_mark"></c:VerticalLayout>
-				<c:VerticalLayout>
-					<c:TextView Text="#manager#" CssClass="description_row"></c:TextView>
-					<c:TextView Text="$objMan.Description" CssClass="main_row_manager"></c:TextView>
-
-				</c:VerticalLayout>
 
 
-			</c:HorizontalLayout> -->
+
+
+
+
+
+
+
+
+			<!-- <c:HorizontalLayout CssClass="grid"> <c:VerticalLayout CssClass="no_mark"></c:VerticalLayout> 
+				<c:VerticalLayout> <c:TextView Text="#descriptioncust#" CssClass="description_row"></c:TextView> 
+				<c:TextView Text="$objCust.Description" CssClass="main_row_custname"></c:TextView> 
+				</c:VerticalLayout> <c:Image /> </c:HorizontalLayout> <c:HorizontalLayout 
+				CssClass="end_of_block" /> <c:HorizontalLayout CssClass="caption_grid"> <c:TextView 
+				Text="#request#:"></c:TextView> </c:HorizontalLayout> <c:HorizontalLine /> 
+				<s:If Test="$isProgress($Curreq.Status)"> <c:DockLayout CssClass="parameter_grid" 
+				OnClickAction="$SetBeginDate($Curreq.Id)"> <c:TextView Text="#begin#"></c:TextView> 
+				<c:TextView Id="beginDate" Text="$DoFullDate($Curreq.PlanStartDataTime)" 
+				CssClass="value"></c:TextView> </c:DockLayout> </s:If> <s:Else> <c:DockLayout 
+				CssClass="parameter_grid"> <c:TextView Text="#begin#" CssClass="disableItem"></c:TextView> 
+				<c:TextView Id="beginDate" Text="$DoFullDate($Curreq.PlanStartDataTime)" 
+				CssClass="value"></c:TextView> </c:DockLayout> </s:Else> <c:HorizontalLine 
+				/> <s:If Test="$isProgress($Curreq.Status)"> <c:DockLayout CssClass="parameter_grid" 
+				OnClickAction="$SetEndDate($Curreq.Id)"> <c:TextView Text="#end#"></c:TextView> 
+				<c:TextView Id="endDate" Text="$DoFullDate($Curreq.PlanEndDataTime)" CssClass="value"></c:TextView> 
+				</c:DockLayout> </s:If> <s:Else> <c:DockLayout CssClass="parameter_grid"> 
+				<c:TextView Text="#end#" CssClass="disableItem"></c:TextView> <c:TextView 
+				Id="endDate" Text="$DoFullDate($Curreq.PlanEndDataTime)" CssClass="value"></c:TextView> 
+				</c:DockLayout> </s:Else> <c:HorizontalLine /> <c:HorizontalLayout CssClass="memo_block"> 
+				<c:VerticalLayout> <c:TextView Text="#requesttext#" CssClass="description_row"></c:TextView> 
+				<c:TextView Text="$Curreq.TextTask" CssClass="main_row_reqtext"></c:TextView> 
+				</c:VerticalLayout> </c:HorizontalLayout> <c:HorizontalLine /> <c:HorizontalLayout 
+				CssClass="grid" OnClickAction="$Workflow.DoAction(SelectItem)"> <c:VerticalLayout 
+				CssClass="no_mark"></c:VerticalLayout> <c:VerticalLayout> <c:TextView Text="#manager#" 
+				CssClass="description_row"></c:TextView> <c:TextView Text="$objMan.Description" 
+				CssClass="main_row_manager"></c:TextView> </c:VerticalLayout> </c:HorizontalLayout> -->
 			<c:HorizontalLayout CssClass="end_of_block" />
 
 		</c:ScrollView>

@@ -140,6 +140,23 @@ dock-align: right;
             color: #b96f18;
             font: 38% Arial;
         }
+        
+.btn_footer
+{
+width: 100%;
+height: 100%;
+dock-align: right;
+}
+
+	.btn_footer TextView {
+            width: 100%;
+            height: 100%;
+            margin-left: 0%;
+            padding-top: 25%;
+            text-align: center;
+            color: #b96f18;
+            font: 38% Arial;
+        }
 
 .vlmanager {
         width: 100%;

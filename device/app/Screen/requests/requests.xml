@@ -53,29 +53,26 @@
 			<c:HorizontalLayout CssClass="search">
 				<c:DockLayout>
 					<c:Image />
-					<c:EditText Id="edtSearchToDay" Text="$searchToDay"
-						Placeholder="#search#"></c:EditText>
+					<c:EditText Id="edtSearchToDay" Text="$searchToDay"	Placeholder="#search#"></c:EditText>
 				</c:DockLayout>
-				<c:Button Id="btnSearch" Text="#search#"
-					OnClickAction="$findtodaytext($edtSearchToDay.Text)"></c:Button>
+				<c:Button Id="btnSearch" Text="#search#" OnClickAction="$findtodaytext($edtSearchToDay.Text)"></c:Button>
 			</c:HorizontalLayout>
 			<c:HorizontalLayout CssClass="shadowLine"></c:HorizontalLayout>
 			<c:ScrollView Id="SVToDay">
 				<s:If Test="$sv > 0">
-					<s:Push Id="sv"
-						Value="$GetToDayUnDoneRequestsWithSearch($searchToDay, 1)"></s:Push>
+					<s:Push Id="sv"	Value="$GetToDayUnDoneRequestsWithSearch($searchToDay, 1)"></s:Push>
 					<s:If Test="$sv > 0">
 						<c:HorizontalLayout CssClass="caption_grid">
-							<s:Push Id="undonerequests"
-								Value="$GetToDayUnDoneRequestsWithSearch($searchToDay, 0)"></s:Push>
-
+							<s:Push Id="undonerequests"	Value="$GetToDayUnDoneRequestsWithSearch($searchToDay, 0)"></s:Push>
+							
 							<c:TextView Text="#undonerequests# ({$sv}):"></c:TextView>
 						</c:HorizontalLayout>
 
 						<s:Iterator Id="request" Value="$undonerequests">
-
+						
 							<c:HorizontalLine />
-							<c:HorizontalLayout CssClass="grid" OnClickAction="$Workflow.DoAction(SelectRequest, $request.Ind)">
+							<!-- <c:HorizontalLayout CssClass="grid" OnClickAction="$Workflow.DoAction(SelectRequest, $request.Ind)">-->
+							<c:HorizontalLayout CssClass="grid" OnClickAction="$AddPeremAndAction(cpReq, $request.Ind, SelectRequest)">
 								<c:VerticalLayout CssClass="no_mark"></c:VerticalLayout>
 								<c:VerticalLayout>
 									<c:TextView Text="$request.Descr" CssClass="main_row"></c:TextView>
@@ -129,13 +126,11 @@
 			<s:If Test="$usv > 0">
 				<c:ScrollView Id="SVAll">
 					<s:Push Id="allrequests" Value="$GetAllActiveTaskDetails($searchAll)"></s:Push>
-
+										
 					<s:Iterator Id="allrequest" Value="$allrequests">
 
-
-
 						<c:HorizontalLine />
-						<c:HorizontalLayout CssClass="grid" OnClickAction="$Workflow.DoAction(SelectRequest, $request.Ind)">
+						<c:HorizontalLayout CssClass="grid" OnClickAction="$AddPeremAndAction(cpReq, $allrequest.Ind, SelectRequest)">
 							<c:VerticalLayout CssClass="no_mark"></c:VerticalLayout>
 							<c:VerticalLayout>
 								<c:TextView Text="$allrequest.Descr" CssClass="main_row"></c:TextView>
